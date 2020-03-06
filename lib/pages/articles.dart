@@ -61,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     context,
                     MaterialPageRoute(builder: (context) => MyArticleDetail(artigos[i].documentID.toString())),
                   );
+                  print(artigos[i].documentID.toString());
                 },
                 child: Container(
                   height: 220,

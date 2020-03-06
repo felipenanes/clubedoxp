@@ -25,6 +25,7 @@ class _MyArticleDetail extends State<MyArticleDetail> {
   }
 
   void getSingleArticle() async {
+    print(articleId);
     article = await db.collection("artigos").document(articleId).get();
     setState(() {
       isLoading = false;
@@ -47,7 +48,7 @@ class _MyArticleDetail extends State<MyArticleDetail> {
 
   TextStyle estiloTextoArtigo =
       new TextStyle(fontSize: 18, color: Colors.black, fontFamily: 'OpenSans');
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +99,7 @@ class _MyArticleDetail extends State<MyArticleDetail> {
                     alignment: Alignment.bottomRight,
                     child: Text(
                       article['Autor'] + ' - ' + article['Data'],
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
