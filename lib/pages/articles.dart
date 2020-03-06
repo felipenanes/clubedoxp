@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'article-detail.dart';
@@ -5,72 +6,105 @@ import 'article-detail.dart';
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<DocumentSnapshot> artigos = new List<DocumentSnapshot>();
+  final db = Firestore.instance;
+  var isLoading = false;
+
+  @override
+  void initState() {
+    setState(() {
+      isLoading = true;
+    });
+    super.initState();
+    getArticles();
+  }
+
+  @override
+  void setState(fn) {
+    super.setState(fn);
+  }
+
+
+  /* Recupera todos os artigos publicados no Firebase */
+  /* retorno: Lista de DocumentSnapshots com os artigos (var: artigos) */
+  void getArticles() async {
+    await db.collection("artigos").getDocuments().then((transac) {
+      transac.documents.forEach((doc) async {
+        artigos.add(doc);
+      });
+    });
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
           backgroundColor: Colors.black,
         ),
-        body: new ListView.builder(
-          itemCount: 3,
+        body: (!isLoading)?  new ListView.builder(
+          itemCount: artigos.length,
           padding: const EdgeInsets.all(16),
           itemBuilder: (context, i) {
-
             return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MyArticleDetail()),
+                    MaterialPageRoute(builder: (context) => MyArticleDetail(artigos[i].documentID.toString())),
                   );
                 },
-            child: Container(
-              height: 220,
-              child: Card(
-                elevation: 5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(0.0),
-                      height: 120,
-                      width: MediaQuery.of(context).size.width*0.898,
-                      color: Colors.black,
-                      child: Image.asset(
-                          "assets/images/tormenta20.jpeg",
-                          fit: BoxFit.cover,
-                          alignment: Alignment.topCenter
-                      ),
+                child: Container(
+                  height: 220,
+                  child: Card(
+                    elevation: 5,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.all(0.0),
+                          height: 120,
+                          width: MediaQuery.of(context).size.width * 0.898,
+                          color: Colors.black,
+                          child: Image.network(artigos[i]['Foto Capa'],
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 5, left: 10),
+                          width: double.infinity,
+                          height: 50,
+                          child: Text(
+                            artigos[i]['Titulo'],
+                            style: TextStyle(
+                                fontSize: 22, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 5, right: 10),
+                          width: double.infinity,
+                          height: 20,
+                          alignment: Alignment.bottomRight,
+                          child: Text(
+                            "por "+artigos[i]['Autor'],
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        )
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top:5, left: 10),
-                      width: double.infinity,
-                      height: 50,
-                      child: Text("A experiência de construir uma ficha em Tormenta20", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold , fontFamily: "Roboto"),),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top:5, right: 10),
-                      width: double.infinity,
-                      height: 20,
-                      alignment: Alignment.bottomRight,
-                      child: Text("por Felipe Nanes", style: TextStyle(fontSize: 16 , fontFamily: "Roboto"),),
-                    )],
-                ),
-              ),
-            ));
+                  ),
+                ));
           },
+        ):Center(
+          child: CircularProgressIndicator(),
         ));
   }
 }

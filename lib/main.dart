@@ -13,11 +13,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'Montserrat'
       ),
       home: MyHomePage(title: 'Clube do XP - Artigos'),
       routes: <String, WidgetBuilder>{
         "/Home": (BuildContext context) => new MyHomePage(),
-        "/Detail": (BuildContext context) => new MyArticleDetail(),
       },
     );
   }
